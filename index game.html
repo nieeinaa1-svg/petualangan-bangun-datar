@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Petualangan Layang-Layang di Perkebunan</title>
+<style>
+:root{--green:#2f855a;--dark:#20543b;--cream:#fff8df;--yellow:#ffd45c;--blue:#bdeaff}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;color:#244333;background:linear-gradient(#bdeaff 0 35%,#d9f4b5 35% 100%);min-height:100vh}
+header{padding:22px 16px;text-align:center;background:linear-gradient(120deg,#2f855a,#69b96b);color:white;border-bottom:6px solid #f6c453}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2.5rem);text-shadow:0 2px 2px #245}header p{margin:7px 0 0}
+main{max-width:950px;margin:22px auto;padding:0 14px}.scene{background:#fffdf2;border:3px solid #e4b84c;border-radius:24px;padding:clamp(16px,4vw,30px);box-shadow:0 10px 25px #37633b33}
+.landscape{font-size:2.3rem;text-align:center;letter-spacing:7px;margin:8px 0 16px}.kite{display:inline-block;font-size:4rem;animation:float 2.5s ease-in-out infinite}@keyframes float{50%{transform:translateY(-12px) rotate(5deg)}}
+h2{color:#26734d;margin-top:0}.muted{color:#587463}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+button{border:0;border-radius:14px;padding:12px 18px;font-weight:750;background:#f4c64e;color:#493b13;cursor:pointer;box-shadow:0 3px 0 #c89d31;font-size:1rem}button:hover{filter:brightness(1.04);transform:translateY(-1px)}button.secondary{background:#d8f0dc;color:#24583d;box-shadow:0 3px 0 #9dcba6}button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}.pill{background:#e4f5df;padding:8px 13px;border-radius:30px;font-weight:700}
+.question{font-size:1.15rem;font-weight:700;margin:18px 0}.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.answers button{background:white;border:2px solid #a9d5ad;box-shadow:none;text-align:left;color:#254c36}.answers button.correct{background:#d5f5d7;border-color:#2c9a50}.answers button.wrong{background:#ffe0d9;border-color:#d76b55}
+.feedback{padding:12px;border-radius:12px;margin:14px 0;background:#e8f4ff}.shapegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px}.shape{background:#f0f8e9;border:2px solid #c6dfb9;border-radius:16px;padding:14px;text-align:center}.shape svg{width:90px;height:72px}.shape b{display:block;margin-top:5px}
+.progress{height:12px;background:#e3e9d9;border-radius:20px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;background:#48a86c;width:0}
+footer{text-align:center;color:#476a50;padding:20px;font-size:.9rem}
+@media(max-width:520px){.landscape{letter-spacing:1px}.row{align-items:stretch}.row button{flex:1}}
+</style></head>
+<body>
+<header><h1>🪁 Petualangan Layang-Layang di Perkebunan</h1><p>Belajar bangun datar sambil menjelajahi kebun yang seru!</p></header>
+<main>
+<section id="home" class="scene">
+ <div class="landscape">🌳 🌼 🌻 🌳 🌷 🌴<br><span class="kite">🪁</span><br>🌱 🍃 🌺 🍀 🌱</div>
+ <h2>Halo, Petualang Cilik!</h2><p>Ikuti Kiki si Layang-Layang menyusuri perkebunan. Selesaikan empat misi matematika untuk menjadi ahli bangun datar!</p>
+ <div class="row"><button onclick="showHelp()">📖 Petunjuk</button><button class="secondary" onclick="showGoals()">🎯 Tujuan belajar</button><button onclick="startGame()">Mulai petualangan ▶</button></div>
+ <div id="help" class="feedback hidden">Pilih jawaban yang menurutmu benar. Setiap jawaban benar bernilai 10 poin. Selesaikan semua level untuk melihat hasil akhir. Kamu dapat membaca pembahasan setelah menjawab.</div>
+ <div id="goals" class="feedback hidden">Setelah bermain, kamu diharapkan mampu mengenali bangun datar, menjelaskan ciri dan sifatnya, serta menghitung luas dan keliling beberapa bangun datar.</div>
+</section>
+<section id="game" class="scene hidden">
+ <div class="stats"><span class="pill" id="levelLabel">Level 1</span><span class="pill">⭐ Skor: <span id="score">0</span></span><span class="pill">Soal: <span id="qnum">1/5</span></span></div>
+ <div class="progress"><span id="bar"></span></div>
+ <div class="landscape">🌳 🌻 🪁 🌼 🌳</div>
+ <h2 id="levelTitle"></h2><p class="muted" id="levelIntro"></p>
+ <div id="visual"></div><div class="question" id="question"></div><div class="answers" id="answers"></div>
+ <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+ <div class="row" style="margin-top:18px"><button class="secondary" onclick="goHome()">🏡 Beranda</button><button id="next" onclick="nextQuestion()" disabled>Lanjut ➜</button></div>
+</section>
+<section id="result" class="scene hidden">
+ <div class="landscape">🎉 🌻 🪁 🌼 🎉</div><h2>Petualangan Selesai!</h2><p id="finalScore" class="question"></p><h2 id="rank"></h2><p id="message"></p><div class="row"><button onclick="startGame()">🔄 Main lagi</button><button class="secondary" onclick="goHome()">🏡 Kembali ke beranda</button></div>
+</section>
+</main><footer>Matematika Fase D • Bangun Datar • Semangat belajar! 🌿</footer>
+<script>
+const levels=[
+{title:"Level 1 – Menjelajah Bentuk",intro:"Temukan bentuk-bentuk geometri di sekitar perkebunan.",qs:[
+["Bangun datar adalah bangun yang memiliki ...","Panjang dan lebar, tanpa ketebalan","Panjang, lebar, dan tinggi","Hanya satu ukuran","Tidak memiliki sisi",0,"Bangun datar merupakan bentuk dua dimensi: memiliki panjang dan lebar, tetapi tidak memiliki ketebalan."],
+["Bangun datar yang memiliki empat sisi sama panjang dan empat sudut siku-siku adalah ...","Persegi panjang","Persegi","Belah ketupat","Trapesium",1,"Persegi memiliki empat sisi sama panjang dan empat sudut siku-siku."],
+["Bentuk roda sepeda paling tepat menyerupai ...","Segitiga","Lingkaran","Jajar genjang","Layang-layang",1,"Roda berbentuk lingkaran."],
+["Bangun datar yang memiliki tiga sisi disebut ...","Segiempat","Lingkaran","Segitiga","Trapesium",2,"Segitiga mempunyai tiga sisi dan tiga sudut."],
+["Papan kebun berbentuk 8 cm × 5 cm menyerupai ...","Persegi panjang","Persegi","Belah ketupat","Lingkaran",0,"Persegi panjang memiliki dua pasang sisi berhadapan yang sama panjang."]]},
+{title:"Level 2 – Detektif Ciri dan Sifat",intro:"Bantu Kiki mengenali ciri dan sifat bangun datar.",qs:[
+["Berapa jumlah sisi pada segiempat?","3 sisi","4 sisi","5 sisi","6 sisi",1,"Segiempat memiliki empat sisi dan empat sudut."],
+["Sifat utama persegi panjang adalah ...","Semua sisi selalu sama panjang","Dua pasang sisi berhadapan sama panjang dan sejajar","Tidak memiliki sudut","Hanya satu sisi sejajar",1,"Persegi panjang memiliki dua pasang sisi berhadapan yang sama panjang dan sejajar."],
+["Segitiga sama sisi memiliki ...","Dua sisi sama panjang","Tiga sisi sama panjang","Empat sisi sama panjang","Tidak memiliki sisi sama panjang",1,"Ketiga sisi segitiga sama sisi memiliki panjang yang sama."],
+["Bangun datar yang memiliki tepat satu pasang sisi sejajar adalah ...","Trapesium","Persegi","Belah ketupat","Layang-layang",0,"Dalam definisi yang digunakan di sini, trapesium memiliki satu pasang sisi sejajar."],
+["Pada layang-layang, terdapat ...","Dua pasang sisi berdekatan sama panjang","Empat sisi sama panjang","Empat sudut siku-siku","Dua pasang sisi berhadapan sejajar",0,"Layang-layang memiliki dua pasang sisi berdekatan yang sama panjang."]]},
+{title:"Level 3 – Kebun Hitung Luas dan Keliling",intro:"Gunakan rumus untuk membantu Kiki menghitung ukuran petak kebun.",qs:[
+["Luas persegi dengan sisi 6 cm adalah ...","12 cm²","24 cm²","36 cm²","30 cm²",2,"L = s × s = 6 × 6 = 36 cm²."],
+["Keliling persegi panjang dengan panjang 9 cm dan lebar 4 cm adalah ...","13 cm","26 cm","36 cm","18 cm",1,"K = 2 × (p + l) = 2 × (9 + 4) = 26 cm."],
+["Luas segitiga dengan alas 10 cm dan tinggi 6 cm adalah ...","60 cm²","16 cm²","30 cm²","32 cm²",2,"L = ½ × alas × tinggi = ½ × 10 × 6 = 30 cm²."],
+["Luas layang-layang dengan diagonal 12 cm dan 8 cm adalah ...","96 cm²","48 cm²","40 cm²","20 cm²",1,"L = ½ × d₁ × d₂ = ½ × 12 × 8 = 48 cm²."],
+["Keliling persegi dengan sisi 7 cm adalah ...","14 cm","21 cm","28 cm","49 cm",2,"K = 4 × s = 4 × 7 = 28 cm."]]},
+{title:"Level 4 – Misi Akhir Perkebunan",intro:"Lima tantangan campuran menantimu. Tunjukkan kemampuan terbaikmu!",qs:[
+["Rumus luas jajar genjang adalah ...","alas × tinggi","sisi × sisi","½ × alas × tinggi","4 × sisi",0,"Luas jajar genjang = alas × tinggi."],
+["Belah ketupat memiliki ...","Empat sisi sama panjang","Hanya dua sisi","Tiga sudut","Tidak memiliki diagonal",0,"Keempat sisi belah ketupat sama panjang."],
+["Keliling segitiga dengan sisi 5 cm, 6 cm, dan 7 cm adalah ...","18 cm","30 cm","11 cm","21 cm",0,"Keliling segitiga = jumlah semua sisi = 5 + 6 + 7 = 18 cm."],
+["Luas trapesium dengan sisi sejajar 8 cm dan 12 cm serta tinggi 5 cm adalah ...","100 cm²","50 cm²","40 cm²","60 cm²",1,"L = ½ × (jumlah sisi sejajar) × tinggi = ½ × (8 + 12) × 5 = 50 cm²."],
+["Sebuah petak persegi memiliki keliling 32 m. Panjang sisinya adalah ...","4 m","6 m","8 m","16 m",2,"Sisi persegi = keliling ÷ 4 = 32 ÷ 4 = 8 m."]]}
+];
+let level=0,index=0,score=0,answered=false;
+function show(id){["home","game","result"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id))}
+function showHelp(){document.getElementById("help").classList.toggle("hidden")}
+function showGoals(){document.getElementById("goals").classList.toggle("hidden")}
+function goHome(){show("home")}
+function startGame(){level=0;index=0;score=0;show("game");render()}
+function render(){
+ const L=levels[level],q=L.qs[index];answered=false;
+ document.getElementById("levelLabel").textContent=`Level ${level+1} dari 4`;
+ document.getElementById("score").textContent=score;
+ document.getElementById("qnum").textContent=`${index+1}/${L.qs.length}`;
+ document.getElementById("bar").style.width=`${((index)/L.qs.length)*100}%`;
+ document.getElementById("levelTitle").textContent=L.title;
+ document.getElementById("levelIntro").textContent=L.intro;
+ document.getElementById("visual").innerHTML=level===2?'<div class="feedback">📐 Rumus pengingat: Persegi L=s², K=4s • Persegi panjang L=p×l, K=2(p+l) • Segitiga L=½×a×t • Layang-layang L=½×d₁×d₂</div>':'';
+ document.getElementById("question").textContent=q[0];
+ const a=document.getElementById("answers");a.innerHTML="";
+ q.slice(1,5).forEach((v,i)=>{let b=document.createElement("button");b.textContent=String.fromCharCode(65+i)+". "+v;b.onclick=()=>choose(i,b);a.appendChild(b)});
+ document.getElementById("feedback").classList.add("hidden");
+ document.getElementById("next").disabled=true;
+ document.getElementById("next").textContent=index===L.qs.length-1?(level===3?"Lihat hasil 🏆":"Lanjut level ➜"):"Soal berikutnya ➜";
+}
+function choose(choice,btn){
+ if(answered)return;answered=true;const q=levels[level].qs[index],ok=choice===q[5];
+ if(ok)score+=10;
+ [...document.querySelectorAll("#answers button")].forEach((b,i)=>{b.disabled=true;if(i===q[5])b.classList.add("correct");else if(i===choice&&!ok)b.classList.add("wrong")});
+ const f=document.getElementById("feedback");f.classList.remove("hidden");
+ f.innerHTML=(ok?"<b>Hebat! Jawaban kamu benar! 🎉</b>":"<b>Belum tepat, ayo terus belajar! 🌱</b>")+`<br>${q[6]}`;
+ document.getElementById("score").textContent=score;
+ document.getElementById("next").disabled=false;
+}
+function nextQuestion(){
+ if(!answered)return;
+ if(index<levels[level].qs.length-1){index++;render();return}
+ if(level<3){level++;index=0;render();return}
+ showResult();
+}
+function showResult(){
+ show("result");const total=levels.reduce((n,l)=>n+l.qs.length,0),max=total*10;
+ document.getElementById("finalScore").textContent=`Skor kamu: ${score} dari ${max}`;
+ const pct=score/max*100;let rank,msg;
+ if(pct>=90){rank="🏆 Ahli Bangun Datar!";msg="Luar biasa! Kamu sudah menguasai banyak konsep bangun datar."}
+ else if(pct>=70){rank="🌟 Petualang Hebat!";msg="Bagus! Terus berlatih agar semakin mahir."}
+ else if(pct>=50){rank="🌱 Terus Berlatih!";msg="Kamu sudah berkembang. Baca kembali pembahasan dan coba lagi."}
+ else{rank="🪁 Ayo Coba Lagi!";msg="Jangan menyerah. Belajar sedikit demi sedikit akan membuatmu semakin hebat."}
+ document.getElementById("rank").textContent=rank;document.getElementById("message").textContent=msg;
+}
+</script></body></html>
